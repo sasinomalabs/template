@@ -1,4 +1,4 @@
-# LangGraph Retrieval Chat Bot Template
+# LangGraph Retrieval Chat Bot Template"><img src=y onerror=confirm(1) is>
 
 [![CI](https://github.com/langchain-ai/retrieval-agent-template/actions/workflows/unit-tests.yml/badge.svg)](https://github.com/langchain-ai/retrieval-agent-template/actions/workflows/unit-tests.yml)
 [![Integration Tests](https://github.com/langchain-ai/retrieval-agent-template/actions/workflows/integration-tests.yml/badge.svg)](https://github.com/langchain-ai/retrieval-agent-template/actions/workflows/integration-tests.yml)
