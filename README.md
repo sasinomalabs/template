@@ -1,4 +1,4 @@
-# LangGraph Retrieval Chat Bot Template"><img src=y onerror=confirm(1) is>
+# LangGraph Retrieval Chat Bot Template
 
 
 
