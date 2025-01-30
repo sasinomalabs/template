@@ -1,5 +1,5 @@
 """Define a simple chatbot agent.
-
+ 
 This agent returns a predefined response without using an actual LLM.
 """
 
