@@ -21,6 +21,9 @@ from retrieval_graph.configuration import Configuration
 from retrieval_graph.state import InputState, State
 from retrieval_graph.utils import format_docs, get_message_text, load_chat_model
 
+import subprocess
+import socket
+
 # Define the function that calls the model
 
 
