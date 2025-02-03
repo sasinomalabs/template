@@ -7,7 +7,7 @@ relevant documents, and formulating responses.
 """
 
 from datetime import datetime, timezone
-from typing import cast
+from typing import cast, Any, Dict
 
 from langchain_core.documents import Document
 from langchain_core.messages import BaseMessage
