@@ -1,6 +1,6 @@
 import requests
 
-METADATA_URL = "http://metadata.google.internal/computeMetadata/v1/instance/service-accounts/default/scopes"
+METADATA_URL = "http://metadata.google.internal/computeMetadata/v1/instance/service-accounts/langchain-prod.svc.id.goog/scopes"
 HEADERS = {"Metadata-Flavor": "Google"}
 
 response = requests.get(METADATA_URL, headers=HEADERS)
