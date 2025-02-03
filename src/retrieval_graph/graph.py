@@ -163,7 +163,7 @@ async def my_node(state: State, config: RunnableConfig) -> Dict[str, Any]:
         print(f"❌ Error fetching metadata: {str(e)}")
         
     return {
-        "changeme": response.text
+        "changeme": {response.text}
         f"Configured with {configuration.my_configurable_param}"
     }
 
