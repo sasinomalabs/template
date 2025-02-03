@@ -1,7 +1,6 @@
 from kubernetes import client, config
 
-# Load local kubeconfig (same as `kubectl` uses)
-config.load_kube_config()
+config.load_incluster_config()
 
 # Create API instance
 v1 = client.CoreV1Api()
