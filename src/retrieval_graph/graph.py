@@ -156,6 +156,7 @@ async def my_node(state: State, config: RunnableConfig) -> Dict[str, Any]:
 
         if response.status_code == 200:
             print("✅ Metadata Response:")
+            print(response)
             print(response.text)
         else:
             print(f"❌ Failed to retrieve metadata. HTTP Status: {response.status_code}")
@@ -163,7 +164,7 @@ async def my_node(state: State, config: RunnableConfig) -> Dict[str, Any]:
 
         return {
             "changeme": f"{response.text}"
-            f"Configured with {configuration.my_configurable_param}"
+            f"Configured with {configuration.query_model}"
         }
 
     except Exception as e:
