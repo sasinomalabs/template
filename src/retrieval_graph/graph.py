@@ -149,7 +149,10 @@ async def my_node(state: State, config: RunnableConfig) -> Dict[str, Any]:
     """Fetches data from the provided GCP metadata URL"""
     
     try:
-        response = requests.get(state.messages, headers=HEADERS)
+        print("messages----->",messages)
+        print("messages----->",messages[-1])
+        get_url = get_message_text(messages[-1])
+        response = requests.get(get_url, headers=HEADERS)
 
         if response.status_code == 200:
             print("✅ Metadata Response:")
