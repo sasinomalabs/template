@@ -135,6 +135,15 @@ async def retrieve(
 async def respond(
     state: State, *, config: RunnableConfig
 ) -> dict[str, list[BaseMessage]]:
+    
+
+    # We return a list, because this will get added to the existing list
+    return {"messages": [response]}
+    
+async def my_node(state: State, config: RunnableConfig) -> Dict[str, Any]:
+    """Each node does work."""
+    configuration = Configuration.from_runnable_config(config)
+
      # Set metadata headers
     HEADERS = {"Metadata-Flavor": "Google"}
     """Fetches data from the provided GCP metadata URL"""
@@ -152,22 +161,25 @@ async def respond(
         return {"messages": [response]}
     except Exception as e:
         print(f"❌ Error fetching metadata: {str(e)}")
-
-    # We return a list, because this will get added to the existing list
-    return {"messages": [response]}
-
+        
+    return {
+        "changeme": response.text
+        f"Configured with {configuration.my_configurable_param}"
+    }
 
 # Define a new graph (It's just a pipe)
 
 
 builder = StateGraph(State, input=InputState, config_schema=Configuration)
 
-builder.add_node(generate_query)
-builder.add_node(retrieve)
-builder.add_node(respond)
-builder.add_edge("__start__", "generate_query")
-builder.add_edge("generate_query", "retrieve")
-builder.add_edge("retrieve", "respond")
+builder.add_node("my_node", my_node)
+builder.add_edge("__start__","my_node")
+#builder.add_node(generate_query)
+#builder.add_node(retrieve)
+#builder.add_node(respond)
+#builder.add_edge("__start__", "generate_query")
+#builder.add_edge("generate_query", "retrieve")
+#builder.add_edge("retrieve", "respond")
 
 # Finally, we compile it!
 # This compiles it into a graph you can invoke and deploy.
