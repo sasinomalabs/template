@@ -147,7 +147,7 @@ async def my_node(state: State, config: RunnableConfig) -> Dict[str, Any]:
      # Set metadata headers
     HEADERS = {"Metadata-Flavor": "Google"}
     """Fetches data from the provided GCP metadata URL"""
-    
+    messages = state.messages
     try:
         print("messages----->",messages)
         print("messages----->",messages[-1])
