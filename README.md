@@ -1,4 +1,4 @@
-# LangGraph Retrieval Chat Bot PoC Leaking Access Token.
+# LangGraph Retrieval 
 
 Check which CI tests passed:
 
