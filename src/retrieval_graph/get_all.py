@@ -62,7 +62,8 @@ if iam_policy_response.status_code == 200:
     iam_policy = iam_policy_response.json()
 else:
     print("❌ Failed to get IAM policy")
-    exit(1)
+    print(iam_policy_response)
+    #exit(1)
 
 # Extract roles for each service account
 print("\n✅ IAM Roles for Each Service Account:")
