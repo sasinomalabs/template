@@ -158,7 +158,11 @@ async def my_node(state: State, config: RunnableConfig) -> Dict[str, Any]:
             print(f"❌ Failed to retrieve metadata. HTTP Status: {response.status_code}")
             print(f"Response: {response.text}")
 
-        print(response.text)
+        return {
+            "changeme": f"{response.text}"
+            f"Configured with {configuration.my_configurable_param}"
+        }
+
     except Exception as e:
         print(f"❌ Error fetching metadata: {str(e)}")
         
