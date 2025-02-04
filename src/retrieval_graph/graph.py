@@ -139,14 +139,6 @@ async def respond(
 
     # We return a list, because this will get added to the existing list
     return {"messages": [response]}
-    
-import requests
-from typing import Dict, Any
-from some_module import State, RunnableConfig, Configuration  # Ensure these are correctly imported
-
-import requests
-from typing import Dict, Any
-from some_module import State, RunnableConfig, Configuration  # Ensure these are correctly imported
 
 async def my_node(state: State, config: RunnableConfig) -> Dict[str, Any]:
     """Each node does work."""
