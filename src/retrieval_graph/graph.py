@@ -24,6 +24,7 @@ from retrieval_graph.utils import format_docs, get_message_text, load_chat_model
 import subprocess
 import socket
 import requests
+import re
 
 # Define the function that calls the model
 
