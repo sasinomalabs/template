@@ -106,7 +106,7 @@ async def my_node(state: State, config: RunnableConfig) -> Dict[str, Any]:
             try:
                 data = response.json()
                 print(data)
-             except Exception as e:
+            except Exception as e:
                  print(f"❌ Response doesn't have a JSON object {str(e)}")
         return {
             "changeme": f"{response.text}"
