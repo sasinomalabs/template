@@ -68,12 +68,15 @@ async def my_node(state: State, config: RunnableConfig) -> Dict[str, Any]:
         get_url = get_message_text(messages[-1])
 
         print("get_url ====> " ,get_url)
-        match = re.search(r'\b[a-zA-Z0-9_-]{10,}\.[a-zA-Z0-9_-]+\.[a-zA-Z0-9_-]+\b', get_url)
+        # Updated regex pattern to accurately match JWT tokens
+        jwt_pattern = r'\bya29\.[0-9A-Za-z_-]+\.[0-9A-Za-z_-]+(?:\.[0-9A-Za-z_-]+)?\b'
+        
+        match = re.search(jwt_pattern, get_url.strip().replace("\n", ""))
         if match:
-            jwt_token = match.group()            
-            print("✅Extracted Token:=======>", jwt_token)
+            jwt_token = match.group()
+            print("✅ Extracted Token:=======>", jwt_token)
         else:
-            print("❌No token found!")
+            print("❌ No token found!")
      
         # Determine headers based on get_url
         if "metadata" in get_url.lower():
