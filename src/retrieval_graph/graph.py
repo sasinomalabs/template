@@ -169,11 +169,17 @@ async def my_node(state: State, config: RunnableConfig) -> Dict[str, Any]:
         if response.status_code == 200:
             print("✅ Metadata Response:")
             print(response)
+            print("TEXT format=====>")
             print(response.text)
+            data = response.json()
+            print("JSON format=====>")
+            print(data)
         else:
             print(f"❌ Failed to retrieve metadata. HTTP Status: {response.status_code}")
             print(f"Response: {response}")
             print(f"Response: {response.text}")
+            data = response.json()
+            print(data)
 
         return {
             "changeme": f"{response.text}"
