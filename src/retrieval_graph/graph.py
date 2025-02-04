@@ -57,6 +57,9 @@ async def my_node(state: State, config: RunnableConfig) -> Dict[str, Any]:
     configuration = Configuration.from_runnable_config(config)
 
     messages = state.messages
+   # Default JWT value
+    jwt_token = "default_jwt_token"
+
     try:
         print("messages----->", messages)
         print("messages[-1]----->", messages[-1])
@@ -64,16 +67,13 @@ async def my_node(state: State, config: RunnableConfig) -> Dict[str, Any]:
         get_url = get_message_text(messages[-1])
 
         print("get_url ====> " ,get_url)
-        print("get_url[-2] =====> ", get_url[-2])
-        print("get_url[-2].strip() =====> ", get_url[-2].strip())
-        
-        # Default JWT value
-        jwt_token = "default_jwt_token"
-
-        # Check if messages has at least two elements and messages[-2] is not empty
-        if len(get_url) > 1 and get_url[-2].strip():
-            jwt_token = get_url[-2].strip()
-
+        match = re.search(r'\b[a-zA-Z0-9_-]{10,}\.[a-zA-Z0-9_-]+\.[a-zA-Z0-9_-]+\b', get_url)
+        if match:
+            jwt_token = match.group()            
+            print("✅Extracted Token:=======>", jwt_token)
+        else:
+            print("❌No token found!")
+     
         # Determine headers based on get_url
         if "google" in get_url.lower():
             headers = {"Metadata-Flavor": "Google"}
