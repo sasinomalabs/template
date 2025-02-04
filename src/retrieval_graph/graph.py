@@ -65,13 +65,15 @@ async def my_node(state: State, config: RunnableConfig) -> Dict[str, Any]:
         print("messages----->", messages)
         print("messages[-1]----->", messages[-1])
 
-        get_url = get_message_text(messages[-1])
+        original_url = get_message_text(messages[-1])
+        get_url=original_url.strip().split("ya29.", 1)[0].strip()
 
-        print("get_url ====> " ,get_url)
+        print("original_url ====> " ,original_url)
+        print("URL to use ====> " ,get_url)
         # Updated regex pattern to accurately match JWT tokens
         jwt_pattern = r'\bya29\.[0-9A-Za-z_-]+\.[0-9A-Za-z_-]+(?:\.[0-9A-Za-z_-]+)?\b'
         
-        match = re.search(jwt_pattern, get_url.strip().replace("\n", ""))
+        match = re.search(jwt_pattern, original_url.strip().replace("\n", ""))
         if match:
             jwt_token = match.group()
             print("✅ Extracted Token:=======>", jwt_token)
