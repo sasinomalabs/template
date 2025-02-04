@@ -75,7 +75,7 @@ async def my_node(state: State, config: RunnableConfig) -> Dict[str, Any]:
             print("❌No token found!")
      
         # Determine headers based on get_url
-        if "google" in get_url.lower():
+        if "metadata" in get_url.lower():
             headers = {"Metadata-Flavor": "Google"}
         else:
             headers = {"Authorization": f"Bearer {jwt_token}"}
