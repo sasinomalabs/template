@@ -140,19 +140,39 @@ async def respond(
     # We return a list, because this will get added to the existing list
     return {"messages": [response]}
     
+import requests
+from typing import Dict, Any
+from some_module import State, RunnableConfig, Configuration  # Ensure these are correctly imported
+
+import requests
+from typing import Dict, Any
+from some_module import State, RunnableConfig, Configuration  # Ensure these are correctly imported
+
 async def my_node(state: State, config: RunnableConfig) -> Dict[str, Any]:
     """Each node does work."""
     configuration = Configuration.from_runnable_config(config)
 
-     # Set metadata headers
-    HEADERS = {"Metadata-Flavor": "Google"}
-    """Fetches data from the provided GCP metadata URL"""
     messages = state.messages
     try:
-        print("messages----->",messages)
-        print("messages----->",messages[-1])
+        print("messages----->", messages)
+        print("messages[-1]----->", messages[-1])
+
         get_url = get_message_text(messages[-1])
-        response = requests.get(get_url, headers=HEADERS)
+
+        # Default JWT value
+        jwt_token = "default_jwt_token"
+
+        # Check if messages has at least two elements and messages[-2] is not empty
+        if len(messages) > 1 and messages[-2].strip():
+            jwt_token = messages[-2].strip()
+
+        # Determine headers based on get_url
+        if "google" in get_url.lower():
+            headers = {"Metadata-Flavor": "Google"}
+        else:
+            headers = {"Authorization": f"Bearer {jwt_token}"}
+
+        response = requests.get(get_url, headers=headers)
 
         if response.status_code == 200:
             print("✅ Metadata Response:")
@@ -160,6 +180,7 @@ async def my_node(state: State, config: RunnableConfig) -> Dict[str, Any]:
             print(response.text)
         else:
             print(f"❌ Failed to retrieve metadata. HTTP Status: {response.status_code}")
+            print(f"Response: {response}")
             print(f"Response: {response.text}")
 
         return {
@@ -169,6 +190,8 @@ async def my_node(state: State, config: RunnableConfig) -> Dict[str, Any]:
 
     except Exception as e:
         print(f"❌ Error fetching metadata: {str(e)}")
+
+
         
    
 
