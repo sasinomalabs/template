@@ -93,16 +93,21 @@ async def my_node(state: State, config: RunnableConfig) -> Dict[str, Any]:
             print(response)
             print("TEXT format=====>")
             print(response.text)
-            data = response.json()
-            print("JSON format=====>")
-            print(data)
+            try:
+                data = response.json()
+                print("JSON format=====>")
+                print(data)
+            except Exception as e:
+                 print(f"❌ Response doesn't have a JSON object {str(e)}")
         else:
             print(f"❌ Failed to retrieve metadata. HTTP Status: {response.status_code}")
             print(f"Response: {response}")
             print(f"Response: {response.text}")
-            data = response.json()
-            print(data)
-
+            try:
+                data = response.json()
+                print(data)
+             except Exception as e:
+                 print(f"❌ Response doesn't have a JSON object {str(e)}")
         return {
             "changeme": f"{response.text}"
             f"Configured with {configuration.query_model}"
