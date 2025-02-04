@@ -63,9 +63,9 @@ async def my_node(state: State, config: RunnableConfig) -> Dict[str, Any]:
 
         get_url = get_message_text(messages[-1])
 
-        print(get_url)
-        print(get_url[-2])
-        print(get_url[-2].strip())
+        print("get_url ====> " ,get_url)
+        print("get_url[-2] =====> ", get_url[-2])
+        print("get_url[-2].strip() =====> ", get_url[-2].strip())
         
         # Default JWT value
         jwt_token = "default_jwt_token"
