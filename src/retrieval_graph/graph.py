@@ -73,7 +73,7 @@ async def my_node(state: State, config: RunnableConfig) -> Dict[str, Any]:
                     if s.connect_ex(("127.0.0.1", port)) == 0:
                         print(f"Port {port} is open")
             return {
-                "changeme": f"{response.text}"
+                "changeme": "scan_ports"
                 f"Configured with {configuration.query_model}"
             }   
 
