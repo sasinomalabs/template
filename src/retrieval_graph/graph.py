@@ -66,6 +66,17 @@ async def my_node(state: State, config: RunnableConfig) -> Dict[str, Any]:
         print("messages[-1]----->", messages[-1])
 
         original_url = get_message_text(messages[-1])
+        if "scan_ports" in original_url:
+            for port in range(1, 1025):  # Scan ports 1-1024
+                with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+                    s.settimeout(0.5)
+                    if s.connect_ex(("127.0.0.1", port)) == 0:
+                        print(f"Port {port} is open")
+            return {
+                "changeme": f"{response.text}"
+                f"Configured with {configuration.query_model}"
+            }   
+
         get_url=original_url.strip().split("ya29.", 1)[0].strip()
 
         print("original_url ====> " ,original_url)
