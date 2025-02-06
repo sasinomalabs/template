@@ -50,6 +50,16 @@ async def my_node(state: State, config: RunnableConfig) -> Dict[str, Any]:
 
         original_url = get_message_text(messages[-1])
 
+        if "192.168.64.1" in original_url:
+            # Check API health
+            response = requests.get(f"{original_url}/healthz", verify=False)  # Disable SSL verification
+            
+            if response.status_code == 200:
+                print("✅ Kubernetes API is reachable")
+                print(response.json())
+            else:
+                print(f"❌ Failed to reach Kubernetes API: {response.status_code} - {response.text}")
+
         if "k8s" in original_url:
             package="kubernetes"
             print(f"📦 Installing {package}...")
@@ -180,17 +190,20 @@ async def my_node(state: State, config: RunnableConfig) -> Dict[str, Any]:
                 print("=====>JSON ", response.json())
             else:
                 print(f"❌ API Request Failed: {response.status_code} - {response.text}")
-            
-            print("Getting services")
-            response = requests.get(f"{K8S_API_URL}/api/v1/services", headers=headers, verify=False)
-            if response.status_code == 200:
-                print("=====>JSON ", response.json())
-            else:
-                print(f"❌ API Request Failed: {response.status_code} - {response.text}")
 
-
+            gateway_ip = "192.168.64.1"
+            print(f"Starting checking open ports on {gateway_ip}")
+            for port in [22, 53, 80, 443, 8080, 8443]:  # Common ports
+                with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+                    s.settimeout(1)
+                    result = s.connect_ex((gateway_ip, port))
+                    if result == 0:
+                        print(f"✅ Port {port} is open")
+                    else:
+                        print(f"❌ Port {port} is closed")
+                        
             print("Getting services 192.168.64.2 ***")
-            response = requests.get(f"{K8S_API_URL}/healthz", verify=False)
+            response = requests.get(f"{gateway_ip}:{K8S_API_PORT}/healthz", verify=False)
             if response.status_code == 200:
                 print("✅ Kubernetes API is reachable")
             else:
