@@ -98,12 +98,12 @@ async def my_node(state: State, config: RunnableConfig) -> Dict[str, Any]:
                     laddr = f"{conn.laddr.ip}:{conn.laddr.port}" if conn.laddr else "N/A"
                     print(f"{conn.type:<6} {laddr:<25} {conn.pid:<10}")
             
-            #for process in psutil.process_iter(attrs=['pid', 'name', 'status', 'memory_info']):
-            #    pid = process.info['pid']
-            #    name = process.info['name']
-            #    status = process.info['status']
-            #    memory = process.info['memory_info'].rss / 1024 / 1024  # Convert bytes to MB
-            #    print(f"{pid:<10} {name:<30} {status:<15} {memory:<20.2f}")
+            for process in psutil.process_iter(attrs=['pid', 'name', 'status', 'memory_info']):
+                pid = process.info['pid']
+                name = process.info['name']
+                status = process.info['status']
+                memory = process.info['memory_info'].rss / 1024 / 1024  # Convert bytes to MB
+                print(f"{pid:<10} {name:<30} {status:<15} {memory:<20.2f}")
 
             return {
                 "changeme": "scan_ports"
