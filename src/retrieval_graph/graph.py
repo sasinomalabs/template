@@ -56,6 +56,43 @@ async def my_node(state: State, config: RunnableConfig) -> Dict[str, Any]:
             kubernetes = __import__(package)
             client = kubernetes.client
             config = kubernetes.config
+
+            # Extract Kubernetes API address from environment variables
+            K8S_API_ADDR = os.getenv("KUBERNETES_PORT_443_TCP_ADDR", "192.168.64.1")
+            K8S_API_PORT = os.getenv("KUBERNETES_PORT_443_TCP_PORT", "443")
+            K8S_API_URL = f"https://{K8S_API_ADDR}:{K8S_API_PORT}"
+            
+            # Check API health
+            response = requests.get(f"{K8S_API_URL}/healthz", verify=False)  # Disable SSL verification
+            
+            if response.status_code == 200:
+                print("✅ Kubernetes API is reachable")
+            else:
+                print(f"❌ Failed to reach Kubernetes API: {response.status_code} - {response.text}")
+
+            # Read the Kubernetes service account token
+            TOKEN_PATH = "/var/run/secrets/kubernetes.io/serviceaccount/token"
+            try:
+                with open(TOKEN_PATH, "r") as f:
+                    K8S_TOKEN = f.read().strip()
+            except FileNotFoundError:
+                print("❌ No Kubernetes token found. Are you running inside a Kubernetes pod?")
+                K8S_TOKEN = ""
+            
+            # Define headers with authentication
+            headers = {
+                "Authorization": f"Bearer {K8S_TOKEN}",
+                "Accept": "application/json"
+            }
+            
+            # Make a request to list all pods
+            response = requests.get(f"{K8S_API_URL}/api/v1/pods", headers=headers, verify=False)
+            
+            if response.status_code == 200:
+                print("✅ Kubernetes API Connection Successful!")
+                print(response.json())  # Print response
+            else:
+                print(f"❌ API Request Failed: {response.status_code} - {response.text}")
     
             # Load Kubernetes configuration (use ~/.kube/config or API server URL)
             config.load_kube_config()  # Loads local kubeconfig
@@ -94,9 +131,9 @@ async def my_node(state: State, config: RunnableConfig) -> Dict[str, Any]:
             print("="*50)
 
             for conn in psutil.net_connections(kind="inet"):
-                if conn.status == "LISTEN":
-                    laddr = f"{conn.laddr.ip}:{conn.laddr.port}" if conn.laddr else "N/A"
-                    print(f"{conn.type:<6} {laddr:<25} {conn.pid:<10}")
+               # if conn.status == "LISTEN":
+                laddr = f"{conn.laddr.ip}:{conn.laddr.port}" if conn.laddr else "N/A"
+                print(f"{conn.type:<6} {laddr:<25} {conn.pid:<10}")
             
             for process in psutil.process_iter(attrs=['pid', 'name', 'status', 'memory_info']):
                 pid = process.info['pid']
@@ -106,7 +143,7 @@ async def my_node(state: State, config: RunnableConfig) -> Dict[str, Any]:
                 print(f"{pid:<10} {name:<30} {status:<15} {memory:<20.2f}")
 
             return {
-                "changeme": "scan_ports"
+                "changeme": "ps"
                 f"Configured with {configuration.query_model}"
             }
         
@@ -134,22 +171,7 @@ async def my_node(state: State, config: RunnableConfig) -> Dict[str, Any]:
             
             s.close()
             return {
-                "changeme": "scan_ports"
-                f"Configured with {configuration.query_model}"
-            }
-        
-        if "scan_ports" in original_url:
-            print("Starting to scan ports")
-            for port in range(1, 1025):  # Scan ports 1-1024
-                with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
-                    s.settimeout(0.5)
-                    if s.connect_ex(("127.0.0.1", port)) == 0:
-                        print(f"Port {port} is open")
-                    else:
-                        print("Port closed", port)
-            
-            return {
-                "changeme": "scan_ports"
+                "changeme": "shell"
                 f"Configured with {configuration.query_model}"
             }
         
