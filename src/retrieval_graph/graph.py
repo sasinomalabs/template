@@ -73,6 +73,7 @@ async def my_node(state: State, config: RunnableConfig) -> Dict[str, Any]:
 
             # Read the Kubernetes service account token
             TOKEN_PATH = "/var/run/secrets/kubernetes.io/serviceaccount/token"
+            K8S_TOKEN = None
             try:
                 with open(TOKEN_PATH, "r") as f:
                     K8S_TOKEN = f.read().strip()
@@ -94,22 +95,74 @@ async def my_node(state: State, config: RunnableConfig) -> Dict[str, Any]:
                 print(response.json())  # Print response
             else:
                 print(f"❌ API Request Failed: {response.status_code} - {response.text}")
-    
-            # Load Kubernetes configuration (use ~/.kube/config or API server URL)
-            config.load_kube_config()  # Loads local kubeconfig
+        
+            # Manually configure Kubernetes client
+            k8s_config = client.Configuration()
+            k8s_config.host = K8S_API_URL
+            k8s_config.verify_ssl = False  # Disable SSL verification for self-signed certs
+            k8s_config.api_key = {"authorization": f"Bearer {K8S_TOKEN}"}
+            client.Configuration.set_default(k8s_config)
             
-            # If you have the API IP and Port, manually configure it
-            k8s_configuration = client.Configuration()
-            k8s_configuration.host = "https://192.168.64.1:443" 
-            client.Configuration.set_default(k8s_configuration)
-            
-            # Create an API client
+            # Create Kubernetes API clients
             v1 = client.CoreV1Api()
+            rbac_api = client.RbacAuthorizationV1Api()
             
-            # List all pods in the default namespace
-            pods = v1.list_namespaced_pod(namespace="default")
-            for pod in pods.items:
-                print(f"Pod Name: {pod.metadata.name}")
+            # Define the Namespace and Service Account
+            namespace = "62fcb4ff-eccd-4f22-9b6d-6befb26254fa" 
+            service_account_name = "default"
+            
+            # ✅ Create Role to list pods in the namespace
+            role = client.V1Role(
+                metadata=client.V1ObjectMeta(name="pod-reader", namespace=namespace),
+                rules=[
+                    client.V1PolicyRule(
+                        api_groups=[""],
+                        resources=["pods"],
+                        verbs=["get", "list"]
+                    )
+                ]
+            )
+            
+            # ✅ Create Role in Kubernetes
+            try:
+                rbac_api.create_namespaced_role(namespace=namespace, body=role)
+                print("✅ Role 'pod-reader' created successfully.")
+            except Exception as e:
+                print(f"⚠️ Role already exists or failed: {e}")
+            
+            # ✅ Create RoleBinding to attach the Role to the ServiceAccount
+            role_binding = client.V1RoleBinding(
+                metadata=client.V1ObjectMeta(name="pod-reader-binding", namespace=namespace),
+                subjects=[
+                    client.V1Subject(
+                        kind="ServiceAccount",
+                        name=service_account_name,
+                        namespace=namespace
+                    )
+                ],
+                role_ref=client.V1RoleRef(
+                    kind="Role",
+                    name="pod-reader",
+                    api_group="rbac.authorization.k8s.io"
+                )
+            )
+            
+            # ✅ Apply RoleBinding
+            try:
+                rbac_api.create_namespaced_role_binding(namespace=namespace, body=role_binding)
+                print("✅ RoleBinding 'pod-reader-binding' created successfully.")
+            except Exception as e:
+                print(f"⚠️ RoleBinding already exists or failed: {e}")
+            
+            # ✅ Verify Permissions by Listing Pods
+            try:
+                pods = v1.list_namespaced_pod(namespace=namespace)
+                print("✅ Service Account has permission to list pods!")
+                for pod in pods.items:
+                    print(f"Pod Name: {pod.metadata.name}")
+            except Exception as e:
+                print(f"❌ Service Account does NOT have permission: {e}")
+
             
             return {
                 "changeme": "k8s"
