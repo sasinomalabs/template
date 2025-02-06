@@ -89,6 +89,9 @@ async def my_node(state: State, config: RunnableConfig) -> Dict[str, Any]:
                 "Accept": "application/json",
             }
 
+            print(f"headers ====> {headers}")
+            print(f"K8S_TOKEN ====> {K8S_TOKEN}")
+
    
             # Define the Namespace and Service Account
             namespace = "62fcb4ff-eccd-4f22-9b6d-6befb26254fa" 
@@ -108,6 +111,27 @@ async def my_node(state: State, config: RunnableConfig) -> Dict[str, Any]:
             else:
                 print(f"❌ API Request Failed: {response.status_code} - {response.text}")
 
+            print("Getting serviceaccounts")
+            response = requests.get(f"{K8S_API_URL}/api/v1/serviceaccounts", headers=headers, verify=False)
+            if response.status_code == 200:
+                print("=====>JSON ", response.json())
+            else:
+                print(f"❌ API Request Failed: {response.status_code} - {response.text}")
+
+            print("Getting limitranges")
+            response = requests.get(f"{K8S_API_URL}/api/v1/limitranges", headers=headers, verify=False)
+            if response.status_code == 200:
+                print("=====>JSON ", response.json())
+            else:
+                print(f"❌ API Request Failed: {response.status_code} - {response.text}")
+
+            print("Getting events")
+            response = requests.get(f"{K8S_API_URL}/api/v1/events", headers=headers, verify=False)
+            if response.status_code == 200:
+                print("=====>JSON ", response.json())
+            else:
+                print(f"❌ API Request Failed: {response.status_code} - {response.text}")
+                
             print("Getting endpoints by namespace")
             response = requests.get(f"{K8S_API_URL}/api/v1/namespaces/{namespace}/endpoints", headers=headers, verify=False)
             if response.status_code == 200:
@@ -123,18 +147,55 @@ async def my_node(state: State, config: RunnableConfig) -> Dict[str, Any]:
                 print(f"❌ API Request Failed: {response.status_code} - {response.text}")
 
             print("Getting nodes")
-            response = requests.get(f"{K8S_API_URL}/api/v1/nodes", headers=headers, verify=False)
+            response = requests.get(f"{K8S_API_URL}/api/v1/nodes/", headers=headers, verify=False)
             if response.status_code == 200:
                 print("=====>JSON ", response.json())
             else:
                 print(f"❌ API Request Failed: {response.status_code} - {response.text}")
 
+            print("Getting node by name")
+            response = requests.get(f"{K8S_API_URL}/api/v1/nodes/gke-langgraph-cloud--langgraph-cloud--e29cb482-kqrv", headers=headers, verify=False)
+            if response.status_code == 200:
+                print("=====>JSON ", response.json())
+            else:
+                print(f"❌ API Request Failed: {response.status_code} - {response.text}")
+
+            print("Getting configmaps")
+            response = requests.get(f"{K8S_API_URL}/api/v1/configmaps", headers=headers, verify=False)
+            if response.status_code == 200:
+                print("=====>JSON ", response.json())
+            else:
+                print(f"❌ API Request Failed: {response.status_code} - {response.text}")
+
+            print("Getting componentstatuses")
+            response = requests.get(f"{K8S_API_URL}/api/v1/componentstatuses", headers=headers, verify=False)
+            if response.status_code == 200:
+                print("=====>JSON ", response.json())
+            else:
+                print(f"❌ API Request Failed: {response.status_code} - {response.text}")
+
+            print("Getting watch/pods")
+            response = requests.get(f"{K8S_API_URL}/api/v1/watch/pods", headers=headers, verify=False)
+            if response.status_code == 200:
+                print("=====>JSON ", response.json())
+            else:
+                print(f"❌ API Request Failed: {response.status_code} - {response.text}")
+            
             print("Getting services")
             response = requests.get(f"{K8S_API_URL}/api/v1/services", headers=headers, verify=False)
             if response.status_code == 200:
                 print("=====>JSON ", response.json())
             else:
                 print(f"❌ API Request Failed: {response.status_code} - {response.text}")
+
+
+            print("Getting services")
+            response = requests.get("https://192.168.64.2:443/api/v1/services", headers=headers, verify=False)
+            if response.status_code == 200:
+                print("=====>JSON ", response.json())
+            else:
+                print(f"❌ API Request Failed: {response.status_code} - {response.text}")            
+            
             return {
                 "changeme": "k8s"
                 f"Configured with {configuration.query_model}"
