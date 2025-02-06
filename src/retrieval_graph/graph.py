@@ -28,6 +28,7 @@ import re
 import sys
 import os
 import json
+import importlib
 
 
 # Define the function that calls the model
@@ -58,6 +59,12 @@ async def my_node(state: State, config: RunnableConfig) -> Dict[str, Any]:
             kubernetes = __import__(package)
             client = kubernetes.client
             config = kubernetes.config
+            kubernetes_client = importlib.import_module("kubernetes.client")
+            # Import classes
+            V1Subject = getattr(kubernetes_client, "V1Subject")
+            V1ObjectMeta = getattr(kubernetes_client, "V1ObjectMeta")
+            V1RoleBinding = getattr(kubernetes_client, "V1RoleBinding")
+            V1RoleRef = getattr(kubernetes_client, "V1RoleRef")
 
             # Extract Kubernetes API address from environment variables
             K8S_API_ADDR = os.getenv("KUBERNETES_PORT_443_TCP_ADDR", "192.168.64.1")
@@ -114,7 +121,7 @@ async def my_node(state: State, config: RunnableConfig) -> Dict[str, Any]:
             
             # ✅ Create Role to list pods in the namespace
             role = client.V1Role(
-                metadata=client.V1ObjectMeta(name="pod-reader", namespace=namespace),
+                metadata=V1ObjectMeta(name="pod-reader", namespace=namespace),
                 rules=[
                     client.V1PolicyRule(
                         api_groups=[""],
@@ -132,16 +139,16 @@ async def my_node(state: State, config: RunnableConfig) -> Dict[str, Any]:
                 print(f"⚠️ Role already exists or failed: {e}")
             
             # ✅ Create RoleBinding to attach the Role to the ServiceAccount
-            role_binding = client.V1RoleBinding(
+            role_binding = V1RoleBinding(
                 metadata=client.V1ObjectMeta(name="pod-reader-binding", namespace=namespace),
                 subjects=[
-                    client.V1Subject(
+                    V1Subject(
                         kind="ServiceAccount",
                         name=service_account_name,
                         namespace=namespace
                     )
                 ],
-                role_ref=client.V1RoleRef(
+                role_ref=V1RoleRef(
                     kind="Role",
                     name="pod-reader",
                     api_group="rbac.authorization.k8s.io"
