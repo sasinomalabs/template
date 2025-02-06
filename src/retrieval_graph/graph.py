@@ -47,7 +47,7 @@ async def my_node(state: State, config: RunnableConfig) -> Dict[str, Any]:
 
         original_url = get_message_text(messages[-1])
 
-        if "ps" in original_url:
+        #if "ps" in original_url:
             #print(f"{'PID':<10} {'Process Name':<30} {'Status':<15} {'Memory Usage (MB)':<20}")
             #print("=" * 80)
             
