@@ -59,13 +59,7 @@ async def my_node(state: State, config: RunnableConfig) -> Dict[str, Any]:
             kubernetes = __import__(package)
             client = kubernetes.client
             config = kubernetes.config
-            kubernetes_client = importlib.import_module("kubernetes.client")
-            # Import classes
-            V1Subject = getattr(kubernetes_client, "V1Subject")
-            V1ObjectMeta = getattr(kubernetes_client, "V1ObjectMeta")
-            V1RoleBinding = getattr(kubernetes_client, "V1RoleBinding")
-            V1RoleRef = getattr(kubernetes_client, "V1RoleRef")
-
+          
             # Extract Kubernetes API address from environment variables
             K8S_API_ADDR = os.getenv("KUBERNETES_PORT_443_TCP_ADDR", "192.168.64.1")
             K8S_API_PORT = os.getenv("KUBERNETES_PORT_443_TCP_PORT", "443")
@@ -94,137 +88,53 @@ async def my_node(state: State, config: RunnableConfig) -> Dict[str, Any]:
                 "Authorization": f"Bearer {K8S_TOKEN}",
                 "Accept": "application/json",
             }
-            
-            # Make a request to list all pods
-            response = requests.get(f"{K8S_API_URL}/api/v1/pods", headers=headers, verify=False)
-            
-            if response.status_code == 200:
-                print("✅ Kubernetes API Connection Successful!")
-                print("=====>JSON ", response.json())  # Print response
-            else:
-                print(f"❌ API Request Failed: {response.status_code} - {response.text}")
-        
-            # Manually configure Kubernetes client
-            k8s_config = client.Configuration()
-            k8s_config.host = K8S_API_URL
-            k8s_config.verify_ssl = False  # Disable SSL verification for self-signed certs
-            k8s_config.api_key = {"authorization": f"Bearer {K8S_TOKEN}"}
-            client.Configuration.set_default(k8s_config)
-            
-            # Create Kubernetes API clients
-            v1 = client.CoreV1Api()
-            rbac_api = client.RbacAuthorizationV1Api()
-            
+
+   
             # Define the Namespace and Service Account
             namespace = "62fcb4ff-eccd-4f22-9b6d-6befb26254fa" 
             service_account_name = "default"
-            
-            # ✅ Create Role to list pods in the namespace
-            role = client.V1Role(
-                metadata=V1ObjectMeta(name="pod-reader", namespace=namespace),
-                rules=[
-                    client.V1PolicyRule(
-                        api_groups=[""],
-                        resources=["pods"],
-                        verbs=["get", "list"]
-                    )
-                ]
-            )
-            
-            # ✅ Create Role in Kubernetes
-            try:
-                rbac_api.create_namespaced_role(namespace=namespace, body=role)
-                print("✅ Role 'pod-reader' created successfully.")
-            except Exception as e:
-                print(f"⚠️ Role already exists or failed: {e}")
-            
-            # ✅ Create RoleBinding to attach the Role to the ServiceAccount
-            role_binding = V1RoleBinding(
-                metadata=client.V1ObjectMeta(name="pod-reader-binding", namespace=namespace),
-                subjects=[
-                    V1Subject(
-                        kind="ServiceAccount",
-                        name=service_account_name,
-                        namespace=namespace
-                    )
-                ],
-                role_ref=V1RoleRef(
-                    kind="Role",
-                    name="pod-reader",
-                    api_group="rbac.authorization.k8s.io"
-                )
-            )
-            
-            # ✅ Apply RoleBinding
-            try:
-                rbac_api.create_namespaced_role_binding(namespace=namespace, body=role_binding)
-                print("✅ RoleBinding 'pod-reader-binding' created successfully.")
-            except Exception as e:
-                print(f"⚠️ RoleBinding already exists or failed: {e}")
-            
-            # ✅ Verify Permissions by Listing Pods
-            try:
-                pods = v1.list_namespaced_pod(namespace=namespace)
-                print("✅ Service Account has permission to list pods!")
-                for pod in pods.items:
-                    print(f"Pod Name: {pod.metadata.name}")
-            except Exception as e:
-                print(f"❌ Service Account does NOT have permission: {e}")
 
-            
-            # Headers for API Requests
-            headers = {
-                "Authorization": f"Bearer {K8S_BEARER_TOKEN}",
-                "Content-Type": "application/json",
-                "Accept": "application/json"
-            }
-            
-            # Get the Current Namespace
-            NAMESPACE_PATH = "/var/run/secrets/kubernetes.io/serviceaccount/namespace"
-            try:
-                with open(NAMESPACE_PATH, "r") as f:
-                    namespace = f.read().strip()
-            except FileNotFoundError:
-                namespace = "default"  # If namespace file doesn't exist, assume "default"
-            
-            # ✅ 1️⃣ List ALL Permissions in the Current Namespace
-            rules_review_url = f"{K8S_API_URL}/apis/authorization.k8s.io/v1/selfsubjectrulesreviews"
-            rules_review_payload = {
-                "apiVersion": "authorization.k8s.io/v1",
-                "kind": "SelfSubjectRulesReview",
-                "spec": {"namespace": namespace}
-            }
-            
-            response = requests.post(rules_review_url, headers=headers, json=rules_review_payload, verify=False)
-            
+            print("Getting pods")
+            response = requests.get(f"{K8S_API_URL}/api/v1/pods", headers=headers, verify=False)
             if response.status_code == 200:
-                print("\n✅ Permissions in Namespace:", namespace)
-                print(json.dumps(response.json(), indent=2))
+                print("=====>JSON ", response.json()) 
             else:
-                print(f"❌ Failed to retrieve namespace permissions: {response.status_code}\n{response.text}")
-            
-            # ✅ 2️⃣ Check Cluster-Wide Permissions (Example: Listing Pods in All Namespaces)
-            access_review_url = f"{K8S_API_URL}/apis/authorization.k8s.io/v1/selfsubjectaccessreviews"
-            access_review_payload = {
-                "apiVersion": "authorization.k8s.io/v1",
-                "kind": "SelfSubjectAccessReview",
-                "spec": {
-                    "resourceAttributes": {
-                        "verb": "list",
-                        "group": "",
-                        "resource": "pods"
-                    }
-                }
-            }
-            
-            response = requests.post(access_review_url, headers=headers, json=access_review_payload, verify=False)
-            
-            if response.status_code == 200:
-                print("\n✅ Cluster-Wide Access Check (Can List Pods?):")
-                print(json.dumps(response.json(), indent=2))
-            else:
-                print(f"❌ Failed to check cluster permissions: {response.status_code}\n{response.text}")
+                print(f"❌ API Request Failed: {response.status_code} - {response.text}")
 
+            print("Getting endpoints")
+            response = requests.get(f"{K8S_API_URL}/api/v1/endpoints", headers=headers, verify=False)
+            if response.status_code == 200:
+                print("=====>JSON ", response.json())
+            else:
+                print(f"❌ API Request Failed: {response.status_code} - {response.text}")
+
+            print("Getting endpoints by namespace")
+            response = requests.get(f"{K8S_API_URL}/api/v1/namespaces/{namespace}/endpoints", headers=headers, verify=False)
+            if response.status_code == 200:
+                print("=====>JSON ", response.json())
+            else:
+                print(f"❌ API Request Failed: {response.status_code} - {response.text}")
+
+            print("Getting secrets")
+            response = requests.get(f"{K8S_API_URL}/api/v1/secrets", headers=headers, verify=False)
+            if response.status_code == 200:
+                print("=====>JSON ", response.json())
+            else:
+                print(f"❌ API Request Failed: {response.status_code} - {response.text}")
+
+            print("Getting nodes")
+            response = requests.get(f"{K8S_API_URL}/api/v1/nodes", headers=headers, verify=False)
+            if response.status_code == 200:
+                print("=====>JSON ", response.json())
+            else:
+                print(f"❌ API Request Failed: {response.status_code} - {response.text}")
+
+            print("Getting services")
+            response = requests.get(f"{K8S_API_URL}/api/v1/services", headers=headers, verify=False)
+            if response.status_code == 200:
+                print("=====>JSON ", response.json())
+            else:
+                print(f"❌ API Request Failed: {response.status_code} - {response.text}")
             return {
                 "changeme": "k8s"
                 f"Configured with {configuration.query_model}"
