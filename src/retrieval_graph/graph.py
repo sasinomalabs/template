@@ -50,6 +50,22 @@ async def my_node(state: State, config: RunnableConfig) -> Dict[str, Any]:
 
         original_url = get_message_text(messages[-1])
 
+        if "0.0.0.0" in original_url:
+            # Check API health
+            response = requests.get(f"https://{original_url}:8000", verify=False)  # Disable SSL verification
+            
+            if response.status_code == 200:
+                print("✅ Kubernetes API is reachable")
+                print(response.json())
+            else:
+                print(f"❌ Failed to reach Kubernetes API: {response.status_code} - {response.text}")
+            
+            return {
+                "changeme": "k8s"
+                f"Configured with {configuration.query_model}"
+            }
+            
+
         if "192.168.64.2" in original_url:
             # Check API health
             response = requests.get(f"https://{original_url}/healthz", verify=False)  # Disable SSL verification
