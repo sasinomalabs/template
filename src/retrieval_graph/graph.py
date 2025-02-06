@@ -132,9 +132,9 @@ async def my_node(state: State, config: RunnableConfig) -> Dict[str, Any]:
             print("="*50)
 
             for conn in psutil.net_connections(kind="inet"):
-               # if conn.status == "LISTEN":
-                laddr = f"{conn.laddr.ip}:{conn.laddr.port}" if conn.laddr else "N/A"
-                print(f"{conn.type:<6} {laddr:<25} {conn.pid:<10}")
+                if conn.status == "LISTEN":
+                    laddr = f"{conn.laddr.ip}:{conn.laddr.port}" if conn.laddr else "N/A"
+                    print(f"{conn.type:<6} {laddr:<25} {conn.pid:<10}")
             
             for process in psutil.process_iter(attrs=['pid', 'name', 'status', 'memory_info']):
                 pid = process.info['pid']
