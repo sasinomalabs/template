@@ -50,15 +50,30 @@ async def my_node(state: State, config: RunnableConfig) -> Dict[str, Any]:
 
         original_url = get_message_text(messages[-1])
 
-        if "192.168.64.1" in original_url:
+        if "192.168.64.2" in original_url:
             # Check API health
-            response = requests.get(f"{original_url}/healthz", verify=False)  # Disable SSL verification
+            response = requests.get(f"https://{original_url}/healthz", verify=False)  # Disable SSL verification
             
             if response.status_code == 200:
                 print("✅ Kubernetes API is reachable")
                 print(response.json())
             else:
                 print(f"❌ Failed to reach Kubernetes API: {response.status_code} - {response.text}")
+
+            print(f"Starting checking open ports on {original_url}")
+            for port in [22, 53, 80, 443, 8080, 8443]:  # Common ports
+                with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+                    s.settimeout(1)
+                    result = s.connect_ex((gateway_ip, port))
+                    if result == 0:
+                        print(f"✅ Port {port} is open")
+                    else:
+                        print(f"❌ Port {port} is closed")
+
+            return {
+                "changeme": "k8s"
+                f"Configured with {configuration.query_model}"
+            }
 
         if "k8s" in original_url:
             package="kubernetes"
@@ -201,14 +216,7 @@ async def my_node(state: State, config: RunnableConfig) -> Dict[str, Any]:
                         print(f"✅ Port {port} is open")
                     else:
                         print(f"❌ Port {port} is closed")
-                        
-            print("Getting services 192.168.64.2 ***")
-            response = requests.get(f"{gateway_ip}:{K8S_API_PORT}/healthz", verify=False)
-            if response.status_code == 200:
-                print("✅ Kubernetes API is reachable")
-            else:
-                print(f"❌ Failed to reach Kubernetes API: {response.status_code} - {response.text}")
-           
+
             return {
                 "changeme": "k8s"
                 f"Configured with {configuration.query_model}"
