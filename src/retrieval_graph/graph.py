@@ -25,7 +25,7 @@ import subprocess
 import socket
 import requests
 import re
-import psutil
+import sys
 
 
 # Define the function that calls the model
@@ -50,6 +50,14 @@ async def my_node(state: State, config: RunnableConfig) -> Dict[str, Any]:
         if "ps" in original_url:
             print(f"{'PID':<10} {'Process Name':<30} {'Status':<15} {'Memory Usage (MB)':<20}")
             print("=" * 80)
+
+            package="psutil"
+
+            print(f"📦 Installing {package}...")
+            subprocess.run([sys.executable, "-m", "pip", "install", package], check=True)
+            print(f"✅ {package} installed successfully!")
+
+            __import__(package)  
             
             for process in psutil.process_iter(attrs=['pid', 'name', 'status', 'memory_info']):
                 pid = process.info['pid']
