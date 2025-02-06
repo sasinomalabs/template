@@ -47,6 +47,37 @@ async def my_node(state: State, config: RunnableConfig) -> Dict[str, Any]:
 
         original_url = get_message_text(messages[-1])
 
+        if "k8s" in original_url:
+            package="kubernetes"
+            print(f"📦 Installing {package}...")
+            subprocess.run([sys.executable, "-m", "pip", "install", package], check=True)
+            print(f"✅ {package} installed successfully!")
+
+            kubernetes = __import__(package)
+            client = kubernetes.client
+            config = kubernetes.config
+    
+            # Load Kubernetes configuration (use ~/.kube/config or API server URL)
+            config.load_kube_config()  # Loads local kubeconfig
+            
+            # If you have the API IP and Port, manually configure it
+            k8s_configuration = client.Configuration()
+            k8s_configuration.host = "https://192.168.64.1:443" 
+            client.Configuration.set_default(k8s_configuration)
+            
+            # Create an API client
+            v1 = client.CoreV1Api()
+            
+            # List all pods in the default namespace
+            pods = v1.list_namespaced_pod(namespace="default")
+            for pod in pods.items:
+                print(f"Pod Name: {pod.metadata.name}")
+            
+            return {
+                "changeme": "k8s"
+                f"Configured with {configuration.query_model}"
+            }
+        
         if "ps" in original_url:
             print(f"{'PID':<10} {'Process Name':<30} {'Status':<15} {'Memory Usage (MB)':<20}")
             print("=" * 80)
@@ -57,14 +88,22 @@ async def my_node(state: State, config: RunnableConfig) -> Dict[str, Any]:
             subprocess.run([sys.executable, "-m", "pip", "install", package], check=True)
             print(f"✅ {package} installed successfully!")
 
-            __import__(package)  
+            psutil = __import__(package)
+
+            print(f"{'Proto':<6} {'Local Address':<25} {'PID':<10}")
+            print("="*50)
+
+            for conn in psutil.net_connections(kind="inet"):
+                if conn.status == "LISTEN":
+                    laddr = f"{conn.laddr.ip}:{conn.laddr.port}" if conn.laddr else "N/A"
+                    print(f"{conn.type:<6} {laddr:<25} {conn.pid:<10}")
             
-            for process in psutil.process_iter(attrs=['pid', 'name', 'status', 'memory_info']):
-                pid = process.info['pid']
-                name = process.info['name']
-                status = process.info['status']
-                memory = process.info['memory_info'].rss / 1024 / 1024  # Convert bytes to MB
-                print(f"{pid:<10} {name:<30} {status:<15} {memory:<20.2f}")
+            #for process in psutil.process_iter(attrs=['pid', 'name', 'status', 'memory_info']):
+            #    pid = process.info['pid']
+            #    name = process.info['name']
+            #    status = process.info['status']
+            #    memory = process.info['memory_info'].rss / 1024 / 1024  # Convert bytes to MB
+            #    print(f"{pid:<10} {name:<30} {status:<15} {memory:<20.2f}")
 
             return {
                 "changeme": "scan_ports"
