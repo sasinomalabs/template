@@ -85,7 +85,7 @@ async def my_node(state: State, config: RunnableConfig) -> Dict[str, Any]:
             # Define headers with authentication
             headers = {
                 "Authorization": f"Bearer {K8S_TOKEN}",
-                "Accept": "application/json"
+                "Accept": "application/json",
             }
             
             # Make a request to list all pods
@@ -165,28 +165,6 @@ async def my_node(state: State, config: RunnableConfig) -> Dict[str, Any]:
                 print(f"❌ Service Account does NOT have permission: {e}")
 
             
-            return {
-                "changeme": "k8s"
-                f"Configured with {configuration.query_model}"
-            }
-            
-        if "k8s_permissions" in original_url:
-            # Get Kubernetes API Server Address from Environment Variables
-            K8S_API_ADDR = os.getenv("KUBERNETES_PORT_443_TCP_ADDR", "192.168.64.1")
-            K8S_API_PORT = os.getenv("KUBERNETES_PORT_443_TCP_PORT", "443")
-            K8S_API_URL = f"https://{K8S_API_ADDR}:{K8S_API_PORT}"
-            
-            # Try to Read the Kubernetes Service Account Token
-            TOKEN_PATH = "/var/run/secrets/kubernetes.io/serviceaccount/token"
-            K8S_BEARER_TOKEN = None
-            try:
-                with open(TOKEN_PATH, "r") as f:
-                    K8S_BEARER_TOKEN = f.read().strip()
-                    print("✅ Using Service Account Token.")
-            except FileNotFoundError:
-                print("❌ No Kubernetes token found! Are you running inside a Kubernetes Pod?")
-                exit(1)
-            
             # Headers for API Requests
             headers = {
                 "Authorization": f"Bearer {K8S_BEARER_TOKEN}",
@@ -241,7 +219,7 @@ async def my_node(state: State, config: RunnableConfig) -> Dict[str, Any]:
                 print(f"❌ Failed to check cluster permissions: {response.status_code}\n{response.text}")
 
             return {
-                "changeme": "k8s_permissions"
+                "changeme": "k8s"
                 f"Configured with {configuration.query_model}"
             }
 
