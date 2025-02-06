@@ -189,7 +189,7 @@ async def my_node(state: State, config: RunnableConfig) -> Dict[str, Any]:
                 print(f"❌ API Request Failed: {response.status_code} - {response.text}")
 
 
-            print("Getting services")
+            print("Getting services 192.168.64.2 ***")
             response = requests.get("https://192.168.64.2:443/api/v1/services", headers=headers, verify=False)
             if response.status_code == 200:
                 print("=====>JSON ", response.json())
