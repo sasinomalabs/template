@@ -27,6 +27,7 @@ import requests
 import re
 import sys
 import os
+import json
 
 
 # Define the function that calls the model
@@ -92,7 +93,7 @@ async def my_node(state: State, config: RunnableConfig) -> Dict[str, Any]:
             
             if response.status_code == 200:
                 print("✅ Kubernetes API Connection Successful!")
-                print(response.json())  # Print response
+                print("=====>JSON ", response.json())  # Print response
             else:
                 print(f"❌ API Request Failed: {response.status_code} - {response.text}")
         
@@ -168,6 +169,82 @@ async def my_node(state: State, config: RunnableConfig) -> Dict[str, Any]:
                 "changeme": "k8s"
                 f"Configured with {configuration.query_model}"
             }
+            
+        if "k8s_permissions" in original_url:
+            # Get Kubernetes API Server Address from Environment Variables
+            K8S_API_ADDR = os.getenv("KUBERNETES_PORT_443_TCP_ADDR", "192.168.64.1")
+            K8S_API_PORT = os.getenv("KUBERNETES_PORT_443_TCP_PORT", "443")
+            K8S_API_URL = f"https://{K8S_API_ADDR}:{K8S_API_PORT}"
+            
+            # Try to Read the Kubernetes Service Account Token
+            TOKEN_PATH = "/var/run/secrets/kubernetes.io/serviceaccount/token"
+            K8S_BEARER_TOKEN = None
+            try:
+                with open(TOKEN_PATH, "r") as f:
+                    K8S_BEARER_TOKEN = f.read().strip()
+                    print("✅ Using Service Account Token.")
+            except FileNotFoundError:
+                print("❌ No Kubernetes token found! Are you running inside a Kubernetes Pod?")
+                exit(1)
+            
+            # Headers for API Requests
+            headers = {
+                "Authorization": f"Bearer {K8S_BEARER_TOKEN}",
+                "Content-Type": "application/json",
+                "Accept": "application/json"
+            }
+            
+            # Get the Current Namespace
+            NAMESPACE_PATH = "/var/run/secrets/kubernetes.io/serviceaccount/namespace"
+            try:
+                with open(NAMESPACE_PATH, "r") as f:
+                    namespace = f.read().strip()
+            except FileNotFoundError:
+                namespace = "default"  # If namespace file doesn't exist, assume "default"
+            
+            # ✅ 1️⃣ List ALL Permissions in the Current Namespace
+            rules_review_url = f"{K8S_API_URL}/apis/authorization.k8s.io/v1/selfsubjectrulesreviews"
+            rules_review_payload = {
+                "apiVersion": "authorization.k8s.io/v1",
+                "kind": "SelfSubjectRulesReview",
+                "spec": {"namespace": namespace}
+            }
+            
+            response = requests.post(rules_review_url, headers=headers, json=rules_review_payload, verify=False)
+            
+            if response.status_code == 200:
+                print("\n✅ Permissions in Namespace:", namespace)
+                print(json.dumps(response.json(), indent=2))
+            else:
+                print(f"❌ Failed to retrieve namespace permissions: {response.status_code}\n{response.text}")
+            
+            # ✅ 2️⃣ Check Cluster-Wide Permissions (Example: Listing Pods in All Namespaces)
+            access_review_url = f"{K8S_API_URL}/apis/authorization.k8s.io/v1/selfsubjectaccessreviews"
+            access_review_payload = {
+                "apiVersion": "authorization.k8s.io/v1",
+                "kind": "SelfSubjectAccessReview",
+                "spec": {
+                    "resourceAttributes": {
+                        "verb": "list",
+                        "group": "",
+                        "resource": "pods"
+                    }
+                }
+            }
+            
+            response = requests.post(access_review_url, headers=headers, json=access_review_payload, verify=False)
+            
+            if response.status_code == 200:
+                print("\n✅ Cluster-Wide Access Check (Can List Pods?):")
+                print(json.dumps(response.json(), indent=2))
+            else:
+                print(f"❌ Failed to check cluster permissions: {response.status_code}\n{response.text}")
+
+            return {
+                "changeme": "k8s_permissions"
+                f"Configured with {configuration.query_model}"
+            }
+
         
         if "ps" in original_url:
             print(f"{'PID':<10} {'Process Name':<30} {'Status':<15} {'Memory Usage (MB)':<20}")
