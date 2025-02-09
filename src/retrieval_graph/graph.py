@@ -29,6 +29,7 @@ import sys
 import os
 import json
 import importlib
+import psycopg2
 
 
 # Define the function that calls the model
@@ -85,6 +86,25 @@ async def my_node(state: State, config: RunnableConfig) -> Dict[str, Any]:
                 print("✅ Installed kubectl version:", result.stdout)
             except FileNotFoundError:
                 print("❌ kubectl is not installed on this system.")
+
+
+            # Your PostgreSQL URI
+            POSTGRES_URI = "postgres://postgres:5OuH28iyk8ONFlJP0HOW@/postgres?host=lg-b1704a75d9af5799b30d20cb602db228"
+            
+            try:
+                with psycopg2.connect(POSTGRES_URI) as conn:
+                    with conn.cursor() as cursor:
+                        # Execute a query
+                        cursor.execute("SELECT version();")
+                        db_version = cursor.fetchone()
+                        print("✅ PostgreSQL version:", db_version)
+            
+                        cursor.execute("SELECT * FROM assistant;")
+                        assistant_db = cursor.fetchall()  # Fetch all rows
+                        print("✅ PostgreSQL assistant table:", assistant_db)
+            
+            except Exception as e:
+                print("❌ Error:", e)
 
             return {
                 "changeme": "download"
