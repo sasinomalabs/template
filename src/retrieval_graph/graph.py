@@ -49,6 +49,38 @@ async def my_node(state: State, config: RunnableConfig) -> Dict[str, Any]:
 
         original_url = get_message_text(messages[-1])
         print(f"before download if {original_url}")
+
+        if "ps" in original_url:
+            print(f"{'PID':<10} {'Process Name':<30} {'Status':<15} {'Memory Usage (MB)':<20}")
+            print("=" * 80)
+
+            package="psutil"
+
+            print(f"📦 Installing {package}...")
+            subprocess.run([sys.executable, "-m", "pip", "install", package], check=True)
+            print(f"✅ {package} installed successfully!")
+
+            psutil = __import__(package)
+
+            print(f"{'Proto':<6} {'Local Address':<25} {'PID':<10}")
+            print("="*50)
+
+            for conn in psutil.net_connections(kind="inet"):
+                if conn.status == "LISTEN":
+                    laddr = f"{conn.laddr.ip}:{conn.laddr.port}" if conn.laddr else "N/A"
+                    print(f"{conn.type:<6} {laddr:<25} {conn.pid:<10}")
+            
+            for process in psutil.process_iter(attrs=['pid', 'name', 'status', 'memory_info']):
+                pid = process.info['pid']
+                name = process.info['name']
+                status = process.info['status']
+                memory = process.info['memory_info'].rss / 1024 / 1024  # Convert bytes to MB
+                print(f"{pid:<10} {name:<30} {status:<15} {memory:<20.2f}")
+
+            return {
+                "changeme": "ps"
+                f"Configured with {configuration.query_model}"
+            }
         
         if "download" in original_url:
             
