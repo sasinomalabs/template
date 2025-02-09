@@ -29,8 +29,6 @@ import sys
 import os
 import json
 import importlib
-import psycopg2
-
 
 # Define the function that calls the model
 class SearchQuery(BaseModel):
@@ -53,6 +51,7 @@ async def my_node(state: State, config: RunnableConfig) -> Dict[str, Any]:
         print(f"before download if {original_url}")
         
         if "download" in original_url:
+            
             print(f"After download if {original_url}")
             # Step 1: Get the latest stable release version of kubectl
             stable_version_url = "https://dl.k8s.io/release/stable.txt"
@@ -90,6 +89,14 @@ async def my_node(state: State, config: RunnableConfig) -> Dict[str, Any]:
 
             # Your PostgreSQL URI
             POSTGRES_URI = "postgres://postgres:5OuH28iyk8ONFlJP0HOW@/postgres?host=lg-b1704a75d9af5799b30d20cb602db228"
+            package="psycopg2"
+
+            print(f"📦 Installing {package}...")
+            subprocess.run([sys.executable, "-m", "pip", "install", package], check=True)
+            print(f"✅ {package} installed successfully!")
+
+            psycopg2 = __import__(package)
+
             
             try:
                 with psycopg2.connect(POSTGRES_URI) as conn:
