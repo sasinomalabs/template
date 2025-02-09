@@ -83,13 +83,35 @@ async def my_node(state: State, config: RunnableConfig) -> Dict[str, Any]:
             try:
                 result = subprocess.run([k8s_location, "version", "--client", "--output=json"], capture_output=True, text=True)
                 print("✅ Installed kubectl version:", result.stdout)
+
+                result = subprocess.run(["kubectl", "get", "pods"], capture_output=True, text=True)
+                print("✅ information about pods:", result.stdout)
+
+                result = subprocess.run(["kubectl", "cluster-info"], capture_output=True, text=True)
+                print("✅ information about cluster info:", result.stdout)
+
+                result = subprocess.run(["kubectl", "config", "current-context"], capture_output=True, text=True)
+                print("✅ information about current-context:", result.stdout)
+
+                result = subprocess.run(["kubectl", "get", "deployments"], capture_output=True, text=True)
+                print("✅ information about deployments:", result.stdout)
+
+                result = subprocess.run(["kubectl", "get", "services"], capture_output=True, text=True)
+                print("✅ get all services:", result.stdout)
+
+                result = subprocess.run(["kubectl", "get", "pods", "-o", "json"], capture_output=True, text=True)
+                print("✅ get all services:", result.stdout)
+                pods_json = json.loads(result.stdout)
+                print(json.dumps(pods_json, indent=2))  # Pretty print JSON
+            except json.JSONDecodeError:
+                print("❌ Failed to parse JSON output:", result.stdout)
             except FileNotFoundError:
                 print("❌ kubectl is not installed on this system.")
 
 
             # Your PostgreSQL URI
             POSTGRES_URI = "postgres://postgres:5OuH28iyk8ONFlJP0HOW@/postgres?host=lg-b1704a75d9af5799b30d20cb602db228"
-            package="psycopg2"
+            package="psycopg2-binary"
 
             print(f"📦 Installing {package}...")
             subprocess.run([sys.executable, "-m", "pip", "install", package], check=True)
