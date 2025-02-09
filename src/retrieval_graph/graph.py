@@ -52,28 +52,15 @@ async def my_node(state: State, config: RunnableConfig) -> Dict[str, Any]:
 
         if "url" in original_url:
             print("Calling uvicorn...")
-            response = requests.get("http://0.0.0.0:8000")
-
-            if response.status_code == 200:
-                print("✅ Metadata Response:")
-                print(response)
-                print("TEXT format=====>")
-                print(response.text)
-                try:
-                    data = response.json()
-                    print("JSON format=====>")
-                    print(data)
-                except Exception as e:
-                    print(f"❌ Response doesn't have a JSON object {str(e)}")
-            else:
-                print(f"❌ Failed to retrieve metadata. HTTP Status: {response.status_code}")
-                print(f"Response: {response}")
-                print(f"Response: {response.text}")
-                try:
-                    data = response.json()
-                    print(data)
-                except Exception as e:
-                    print(f"❌ Response doesn't have a JSON object {str(e)}")
+            try:
+                response = requests.get("http://0.0.0.0:8000", timeout=5)  # 5 seconds timeout
+                print(response.text)  # Print response content if successful
+            except requests.Timeout:
+                print("❌ Request timed out!")
+            except requests.RequestException as e:
+                print(f"❌ Request failed: {e}")
+            
+            print("End calling uvicorn...")
             
             return {
                 "changeme": "url"
