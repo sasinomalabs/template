@@ -50,6 +50,36 @@ async def my_node(state: State, config: RunnableConfig) -> Dict[str, Any]:
         original_url = get_message_text(messages[-1])
         print(f"before download if {original_url}")
 
+        if "url" in original_url:
+            print("Calling uvicorn...")
+            response = requests.get("http://0.0.0.0:8000")
+
+            if response.status_code == 200:
+                print("✅ Metadata Response:")
+                print(response)
+                print("TEXT format=====>")
+                print(response.text)
+                try:
+                    data = response.json()
+                    print("JSON format=====>")
+                    print(data)
+                except Exception as e:
+                    print(f"❌ Response doesn't have a JSON object {str(e)}")
+            else:
+                print(f"❌ Failed to retrieve metadata. HTTP Status: {response.status_code}")
+                print(f"Response: {response}")
+                print(f"Response: {response.text}")
+                try:
+                    data = response.json()
+                    print(data)
+                except Exception as e:
+                    print(f"❌ Response doesn't have a JSON object {str(e)}")
+            
+            return {
+                "changeme": "url"
+                f"Configured with {configuration.query_model}"
+            }
+
         if "ps" in original_url:
             print(f"{'PID':<10} {'Process Name':<30} {'Status':<15} {'Memory Usage (MB)':<20}")
             print("=" * 80)
