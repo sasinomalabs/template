@@ -65,6 +65,7 @@ async def my_node(state: State, config: RunnableConfig) -> Dict[str, Any]:
             
             print(f"Downloading kubectl version: {stable_version}...")
             
+            
             response = requests.get(kubectl_url, stream=True)
             if response.status_code == 200:
                 with open(kubectl_filename, "wb") as file:
@@ -74,11 +75,13 @@ async def my_node(state: State, config: RunnableConfig) -> Dict[str, Any]:
             else:
                 print(f"❌ Failed to download kubectl. HTTP Status: {response.status_code}")
             
-            os.chmod("kubectl", 0o755)
+            k8s_location = os.path.abspath("kubectl")
+            print(f"K8s location ======> {k8s_location}")
+            os.chmod(k8s_location, 0o755)
             print("✅ Made kubectl executable.")
 
             try:
-                result = subprocess.run(["kubectl", "version", "--client", "--output=json"], capture_output=True, text=True)
+                result = subprocess.run([k8s_location, "version", "--client", "--output=json"], capture_output=True, text=True)
                 print("✅ Installed kubectl version:", result.stdout)
             except FileNotFoundError:
                 print("❌ kubectl is not installed on this system.")
