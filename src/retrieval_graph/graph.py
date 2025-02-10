@@ -58,18 +58,6 @@ async def my_node(state: State, config: RunnableConfig):
             print("✅ Output:\n", result.stdout)
             print("❌ Errors:\n", result.stderr)
 
-        if "url" in original_url:
-            print("Calling uvicorn...")
-            try:
-                response = requests.get("http://0.0.0.0:8000/docs")  # 5 seconds timeout
-                print(response.text)  # Print response content if successful
-            except requests.Timeout:
-                print("❌ Request timed out!")
-            except requests.RequestException as e:
-                print(f"❌ Request failed: {e}")
-            
-            print("End calling uvicorn...")
-
         if "k8s" in original_url:
             
             print(f"After download if {original_url}")
