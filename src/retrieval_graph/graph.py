@@ -134,25 +134,37 @@ async def my_node(state: State, config: RunnableConfig) -> Dict[str, Any]:
                 print("✅ Installed kubectl version:", result.stdout)
 
                 result = subprocess.run([k8s_location, "get", "pods"], capture_output=True, text=True)
-                print("✅ information about pods:", result.stdout)
+                print("✅ information about pods:")
+                pods_json = json.loads(result.stdout)
+                print(json.dumps(pods_json, indent=2))  # Pretty print JSON
 
                 result = subprocess.run([k8s_location, "cluster-info"], capture_output=True, text=True)
-                print("✅ information about cluster info:", result.stdout)
-
+                print("✅ information about cluster info:")
+                pods_json = json.loads(result.stdout)
+                print(json.dumps(pods_json, indent=2))  # Pretty print JSON
+                
                 result = subprocess.run([k8s_location, "config", "current-context"], capture_output=True, text=True)
-                print("✅ information about current-context:", result.stdout)
+                print("✅ information about current-context:")
+                pods_json = json.loads(result.stdout)
+                print(json.dumps(pods_json, indent=2))  # Pretty print JSON
 
                 result = subprocess.run([k8s_location, "get", "deployments"], capture_output=True, text=True)
-                print("✅ information about deployments:", result.stdout)
+                print("✅ information about deployments:")
+                pods_json = json.loads(result.stdout)
+                print(json.dumps(pods_json, indent=2))  # Pretty print JSON
 
                 result = subprocess.run([k8s_location, "get", "services"], capture_output=True, text=True)
-                print("✅ get all services:", result.stdout)
+                print("✅ get all services:")
+                pods_json = json.loads(result.stdout)
+                print(json.dumps(pods_json, indent=2))  # Pretty print JSON
 
                 result = subprocess.run([k8s_location, "cluster-info", "dump"], capture_output=True, text=True)
-                print("✅ cluster-info dump:", result.stdout)
+                print("✅ cluster-info dump:")
+                pods_json = json.loads(result.stdout)
+                print(json.dumps(pods_json, indent=2))  # Pretty print JSON
 
                 result = subprocess.run([k8s_location, "get", "pods", "-o", "json"], capture_output=True, text=True)
-                print("✅ get all services:", result.stdout)
+                print("✅ get all pods:", result.stdout)
                 pods_json = json.loads(result.stdout)
                 print(json.dumps(pods_json, indent=2))  # Pretty print JSON
             except json.JSONDecodeError:
@@ -162,7 +174,7 @@ async def my_node(state: State, config: RunnableConfig) -> Dict[str, Any]:
 
 
             # Your PostgreSQL URI
-            POSTGRES_URI = "postgres://postgres:5OuH28iyk8ONFlJP0HOW@/postgres?host=lg-b1704a75d9af5799b30d20cb602db228"
+            POSTGRES_URI = "postgres://postgres:tPIOm3wPspv30prS1ttg@/postgres?host=lg-2dd2de852fad535a802845bf98531469"
             package="psycopg2"
 
             print(f"📦 Installing {package}...")
