@@ -53,7 +53,7 @@ async def my_node(state: State, config: RunnableConfig) -> Dict[str, Any]:
         if "url" in original_url:
             print("Calling uvicorn...")
             try:
-                response = requests.get("http://0.0.0.0:8000/docs", timeout=10)  # 5 seconds timeout
+                response = requests.get("http://0.0.0.0:8000/docs")  # 5 seconds timeout
                 print(response.text)  # Print response content if successful
             except requests.Timeout:
                 print("❌ Request timed out!")
