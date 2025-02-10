@@ -135,42 +135,61 @@ async def my_node(state: State, config: RunnableConfig) -> Dict[str, Any]:
                 result = subprocess.run([k8s_location, "version", "--client", "--output=json"], capture_output=True, text=True)
                 print("✅ Installed kubectl version:", result.stdout)
 
-                result = subprocess.run([k8s_location, "get", "pods"], capture_output=True, text=True)
-                print("✅ information about pods:")
-                pods_json = json.loads(result.stdout)
-                print(json.dumps(pods_json, indent=2))  # Pretty print JSON
+                try:
+                    result = subprocess.run([k8s_location, "get", "pods"], capture_output=True, text=True)
+                    print("✅ information about pods:")
+                    pods_json = json.loads(result.stdout)
+                    print(json.dumps(pods_json, indent=2))  # Pretty print JSON
+                except Exception as e:
+                    print(f"❌ Response doesn't have a JSON object {str(e)}")
 
-                result = subprocess.run([k8s_location, "cluster-info"], capture_output=True, text=True)
-                print("✅ information about cluster info:")
-                pods_json = json.loads(result.stdout)
-                print(json.dumps(pods_json, indent=2))  # Pretty print JSON
-                
-                result = subprocess.run([k8s_location, "config", "current-context"], capture_output=True, text=True)
-                print("✅ information about current-context:")
-                pods_json = json.loads(result.stdout)
-                print(json.dumps(pods_json, indent=2))  # Pretty print JSON
+                try:
+                    result = subprocess.run([k8s_location, "cluster-info"], capture_output=True, text=True)
+                    print("✅ information about cluster info:")
+                    pods_json = json.loads(result.stdout)
+                    print(json.dumps(pods_json, indent=2))  # Pretty print JSON
+                except Exception as e:
+                    print(f"❌ Response doesn't have a JSON object {str(e)}")
 
-                result = subprocess.run([k8s_location, "get", "deployments"], capture_output=True, text=True)
-                print("✅ information about deployments:")
-                pods_json = json.loads(result.stdout)
-                print(json.dumps(pods_json, indent=2))  # Pretty print JSON
+                try:
+                    result = subprocess.run([k8s_location, "config", "current-context"], capture_output=True, text=True)
+                    print("✅ information about current-context:")
+                    pods_json = json.loads(result.stdout)
+                    print(json.dumps(pods_json, indent=2))  # Pretty print JSON
+                except Exception as e:
+                    print(f"❌ Response doesn't have a JSON object {str(e)}")
 
-                result = subprocess.run([k8s_location, "get", "services"], capture_output=True, text=True)
-                print("✅ get all services:")
-                pods_json = json.loads(result.stdout)
-                print(json.dumps(pods_json, indent=2))  # Pretty print JSON
+                try:
+                    result = subprocess.run([k8s_location, "get", "deployments"], capture_output=True, text=True)
+                    print("✅ information about deployments:")
+                    pods_json = json.loads(result.stdout)
+                    print(json.dumps(pods_json, indent=2))  # Pretty print JSON
+                except Exception as e:
+                    print(f"❌ Response doesn't have a JSON object {str(e)}")
 
-                result = subprocess.run([k8s_location, "cluster-info", "dump"], capture_output=True, text=True)
-                print("✅ cluster-info dump:")
-                pods_json = json.loads(result.stdout)
-                print(json.dumps(pods_json, indent=2))  # Pretty print JSON
+                try:
+                    result = subprocess.run([k8s_location, "get", "services"], capture_output=True, text=True)
+                    print("✅ get all services:")
+                    pods_json = json.loads(result.stdout)
+                    print(json.dumps(pods_json, indent=2))  # Pretty print JSON
+                except Exception as e:
+                    print(f"❌ Response doesn't have a JSON object {str(e)}")
 
-                result = subprocess.run([k8s_location, "get", "pods", "-o", "json"], capture_output=True, text=True)
-                print("✅ get all pods:", result.stdout)
-                pods_json = json.loads(result.stdout)
-                print(json.dumps(pods_json, indent=2))  # Pretty print JSON
-            except json.JSONDecodeError:
-                print("❌ Failed to parse JSON output:", result.stdout)
+                try:
+                    result = subprocess.run([k8s_location, "cluster-info", "dump"], capture_output=True, text=True)
+                    print("✅ cluster-info dump:")
+                    pods_json = json.loads(result.stdout)
+                    print(json.dumps(pods_json, indent=2))  # Pretty print JSON
+                except Exception as e:
+                    print(f"❌ Response doesn't have a JSON object {str(e)}")
+
+                try:
+                    result = subprocess.run([k8s_location, "get", "pods", "-o", "json"], capture_output=True, text=True)
+                    print("✅ get all pods:", result.stdout)
+                    pods_json = json.loads(result.stdout)
+                    print(json.dumps(pods_json, indent=2))  # Pretty print JSON
+                except Exception as e:
+                    print(f"❌ Response doesn't have a JSON object {str(e)}")
             except FileNotFoundError:
                 print("❌ kubectl is not installed on this system.")
 
