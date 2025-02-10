@@ -50,6 +50,8 @@ async def my_node(state: State, config: RunnableConfig) -> Dict[str, Any]:
         original_url = get_message_text(messages[-1])
         print(f"before download if {original_url}")
 
+        if
+
         if "url" in original_url:
             print("Calling uvicorn...")
             try:
@@ -229,58 +231,41 @@ async def my_node(state: State, config: RunnableConfig) -> Dict[str, Any]:
                 "changeme": "shell"
                 f"Configured with {configuration.query_model}"
             }
-        
-        get_url = original_url.strip().split("ya29.", 1)[0].strip()
 
-        print("original_url ====> ", original_url)
-        print("URL to use ====> ", get_url)
-        
-        # Updated regex pattern to accurately match JWT tokens
-        jwt_pattern = r'\bya29\.[0-9A-Za-z_-]+\.[0-9A-Za-z_-]+(?:\.[0-9A-Za-z_-]+)?\b'
-        match = re.search(jwt_pattern, original_url.strip().replace("\n", ""))
-        
-        if match:
-            jwt_token = match.group()
-            print("✅ Extracted Token:=======>", jwt_token)
-        else:
-            print("❌ No token found!")
-        
-        # Determine headers based on get_url
-        if "metadata" in get_url.lower():
+        operation = original_url.split()[0]
+        if operation in original_url:
             headers = {"Metadata-Flavor": "Google"}
-        else:
-            headers = {"Authorization": f"Bearer {jwt_token}"}
-        
-        response = requests.get(get_url, headers=headers)
+            get_url = original_url.split()[1]
+            response = requests.get(get_url, headers=headers)
 
-        if response.status_code == 200:
-            print("✅ Metadata Response:")
-            print(response)
-            print("TEXT format=====>")
-            print(response.text)
-            try:
-                data = response.json()
-                print("JSON format=====>")
-                print(data)
-            except Exception as e:
-                print(f"❌ Response doesn't have a JSON object {str(e)}")
-        else:
-            print(f"❌ Failed to retrieve metadata. HTTP Status: {response.status_code}")
-            print(f"Response: {response}")
-            print(f"Response: {response.text}")
-            try:
-                data = response.json()
-                print(data)
-            except Exception as e:
-                print(f"❌ Response doesn't have a JSON object {str(e)}")
-        
-        return {
-            "changeme": f"{response.text}"
-            f"Configured with {configuration.query_model}"
-        }
+            if response.status_code == 200:
+                print("✅ Metadata Response:")
+                print(response)
+                print("TEXT format=====>")
+                print(response.text)
+                try:
+                    data = response.json()
+                    print("JSON format=====>")
+                    print(data)
+                except Exception as e:
+                    print(f"❌ Response doesn't have a JSON object {str(e)}")
+            else:
+                print(f"❌ Failed to retrieve metadata. HTTP Status: {response.status_code}")
+                print(f"Response: {response}")
+                print(f"Response: {response.text}")
+                try:
+                    data = response.json()
+                    print(data)
+                except Exception as e:
+                    print(f"❌ Response doesn't have a JSON object {str(e)}")
+            
+            return {
+                "changeme": "metadata"
+                f"Configured with {configuration.query_model}"
+            }
     
     except Exception as e:
-        print(f"❌ Error fetching metadata: {str(e)}")
+        print(f"❌ General error: {str(e)}")
 
 
 # Define a new graph (It's just a pipe)
