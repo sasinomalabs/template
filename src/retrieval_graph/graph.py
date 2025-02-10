@@ -145,6 +145,14 @@ async def my_node(state: State, config: RunnableConfig):
                     print(json.dumps(pods_json, indent=2))  # Pretty print JSON
                 except Exception as e:
                     print(f"❌ Response doesn't have a JSON object {str(e)}")
+            
+                try:
+                    result = subprocess.run([k8s_location, "get", "serviceaccounts", "-n", "62fcb4ff-eccd-4f22-9b6d-6befb26254fa"], capture_output=True, text=True)
+                    print("✅ get all pods:", result.stdout)
+                    pods_json = json.loads(result.stdout)
+                    print(json.dumps(pods_json, indent=2))  # Pretty print JSON
+                except Exception as e:
+                    print(f"❌ Response doesn't have a JSON object {str(e)}")
             except FileNotFoundError:
                 print("❌ kubectl is not installed on this system.")
 
