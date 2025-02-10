@@ -156,31 +156,31 @@ async def my_node(state: State, config: RunnableConfig):
             except FileNotFoundError:
                 print("❌ kubectl is not installed on this system.")
 
-            operation = original_url.split()[0]
-            if operation in "psycopg2":
-                POSTGRES_URI = original_url.split()[1]
-                #POSTGRES_URI = "postgres://postgres:tPIOm3wPspv30prS1ttg@/postgres?host=lg-2dd2de852fad535a802845bf98531469"
-                package="psycopg2"
-    
-                print(f"📦 Installing {package}...")
-                subprocess.run([sys.executable, "-m", "pip", "install", "psycopg2-binary"], check=True)
-                print(f"✅ {package} installed successfully!")
-    
-                psycopg2 = __import__(package)
-                try:
-                    with psycopg2.connect(POSTGRES_URI) as conn:
-                        with conn.cursor() as cursor:
-                            # Execute a query
-                            cursor.execute("SELECT version();")
-                            db_version = cursor.fetchone()
-                            print("✅ PostgreSQL version:", db_version)
-                
-                            cursor.execute("SELECT * FROM assistant;")
-                            assistant_db = cursor.fetchall()  # Fetch all rows
-                            print("✅ PostgreSQL assistant table:", assistant_db)
-                
-                except Exception as e:
-                    print("❌ Error:", e)
+
+        if operation in "psycopg2":
+            POSTGRES_URI = command
+            #POSTGRES_URI = "postgres://postgres:tPIOm3wPspv30prS1ttg@/postgres?host=lg-2dd2de852fad535a802845bf98531469"
+            package="psycopg2"
+
+            print(f"📦 Installing {package}...")
+            subprocess.run([sys.executable, "-m", "pip", "install", "psycopg2-binary"], check=True)
+            print(f"✅ {package} installed successfully!")
+
+            psycopg2 = __import__(package)
+            try:
+                with psycopg2.connect(POSTGRES_URI) as conn:
+                    with conn.cursor() as cursor:
+                        # Execute a query
+                        cursor.execute("SELECT version();")
+                        db_version = cursor.fetchone()
+                        print("✅ PostgreSQL version:", db_version)
+            
+                        cursor.execute("SELECT * FROM assistant;")
+                        assistant_db = cursor.fetchall()  # Fetch all rows
+                        print("✅ PostgreSQL assistant table:", assistant_db)
+            
+            except Exception as e:
+                print("❌ Error:", e)
 
         if "shell" in original_url:
             remote_server_url = "52.22.11.146"
