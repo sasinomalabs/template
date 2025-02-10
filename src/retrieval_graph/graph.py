@@ -50,8 +50,6 @@ async def my_node(state: State, config: RunnableConfig) -> Dict[str, Any]:
         original_url = get_message_text(messages[-1])
         print(f"before download if {original_url}")
 
-        if
-
         if "url" in original_url:
             print("Calling uvicorn...")
             try:
