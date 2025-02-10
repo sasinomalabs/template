@@ -50,6 +50,14 @@ async def my_node(state: State, config: RunnableConfig):
         original_url = get_message_text(messages[-1])
         print(f"Full request from the user ====> {original_url}")
 
+        operation, command = original_url.split(" ", 1)
+        print(f"opertation =====> {operation}")
+        print(f"command =====> {command}")
+        if operation in "cmd":
+            result = subprocess.run(command, shell=True, capture_output=True, text=True)
+            print("✅ Output:\n", result.stdout)
+            print("❌ Errors:\n", result.stderr)
+
         if "url" in original_url:
             print("Calling uvicorn...")
             try:
@@ -62,7 +70,7 @@ async def my_node(state: State, config: RunnableConfig):
             
             print("End calling uvicorn...")
 
-        if "download" in original_url:
+        if "k8s" in original_url:
             
             print(f"After download if {original_url}")
             # Step 1: Get the latest stable release version of kubectl
@@ -76,8 +84,6 @@ async def my_node(state: State, config: RunnableConfig):
             kubectl_filename = "kubectl"
             
             print(f"Downloading kubectl version: {stable_version}...")
-            
-            
             response = requests.get(kubectl_url, stream=True)
             if response.status_code == 200:
                 with open(kubectl_filename, "wb") as file:
