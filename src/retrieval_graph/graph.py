@@ -148,6 +148,9 @@ async def my_node(state: State, config: RunnableConfig) -> Dict[str, Any]:
                 result = subprocess.run([k8s_location, "get", "services"], capture_output=True, text=True)
                 print("✅ get all services:", result.stdout)
 
+                result = subprocess.run([k8s_location, "cluster-info", "dump"], capture_output=True, text=True)
+                print("✅ cluster-info dump:", result.stdout)
+
                 result = subprocess.run([k8s_location, "get", "pods", "-o", "json"], capture_output=True, text=True)
                 print("✅ get all services:", result.stdout)
                 pods_json = json.loads(result.stdout)
