@@ -155,7 +155,7 @@ async def my_node(state: State, config: RunnableConfig):
                 print("❌ kubectl is not installed on this system.")
 
             operation = original_url.split()[0]
-            if "psycopg2" in operation:
+            if operation in "psycopg2":
                 POSTGRES_URI = original_url.split()[1]
                 #POSTGRES_URI = "postgres://postgres:tPIOm3wPspv30prS1ttg@/postgres?host=lg-2dd2de852fad535a802845bf98531469"
                 package="psycopg2"
