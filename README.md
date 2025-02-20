@@ -9,3 +9,4 @@ Check which CI tests passed:
 <a href='javascript:'>aaa</a>
 
 
+[aaa](javascript:aaa)
